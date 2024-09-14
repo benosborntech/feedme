@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+    redis:
+        image: redis:latest
+        container_name: redis
+        ports:
+            - "6379:6379"
+    mysql:
+        image: mysql:latest
+        container_name: mysql
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: pass123
+            MYSQL_DATABASE: db
+            MYSQL_USER: user
+            MYSQL_PASSWORD: pass123
+        volumes:
+            - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package updates;
+
+option go_package = "./pb";
+
+service Updates {
+    rpc GetUpdates(GetUpdatesRequest) returns (stream GetUpdatesResponse);
+}
+
+message GetUpdatesRequest {
+    float longX = 1;
+    float latY = 2;
+    float radius = 3;
+}
+
+message GetUpdatesResponse {
+    int64 id = 1;
+    string location = 2;
+    int32 itemType = 3;
+    int32 quantity = 4;
+    google.protobuf.Timestamp createdAt = 5;
+}
