@@ -22,7 +22,7 @@ func NewConfig() *Config {
 
 	redisAddr, ok := os.LookupEnv("REDIS_ADDR")
 	if !ok {
-		log.Print("no redis address provided")
+		log.Print("no redis addr provided")
 	} else {
 		log.Printf("using redis addr, addr=%v", redisAddr)
 	}

@@ -12,6 +12,8 @@ import (
 	"github.com/benosborntech/feedme/pb"
 	"github.com/pierrre/geohash"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -28,7 +30,7 @@ func (s *UpdatesServer) GetUpdates(req *pb.GetUpdatesRequest, stream grpc.Server
 	hash := geohash.Encode(float64(req.LatY), float64(req.LongX), precision)
 	neighbors, err := geohash.GetNeighbors(hash)
 	if err != nil {
-		return fmt.Errorf("failed to get neighbors: %w", err)
+		return status.Errorf(codes.Internal, fmt.Sprintf("failed to get neighbors: %v", err))
 	}
 
 	hashes := []string{
@@ -78,11 +80,14 @@ func (s *UpdatesServer) GetUpdates(req *pb.GetUpdatesRequest, stream grpc.Server
 		select {
 		case msg := <-aggregatedCh:
 			res := &pb.GetUpdatesResponse{
-				Id:        int64(msg.Item.Id),
-				Location:  msg.Item.Location,
-				ItemType:  int32(msg.Item.ItemType),
-				Quantity:  int32(msg.Item.Quantity),
-				CreatedAt: timestamppb.New(msg.Item.CreatedAt),
+				Item: &pb.ItemData{
+					Id:        int64(msg.Item.Id),
+					Location:  msg.Item.Location,
+					ItemType:  int32(msg.Item.ItemType),
+					Quantity:  int32(msg.Item.Quantity),
+					UpdatedAt: timestamppb.New(msg.Item.UpdatedAt),
+					CreatedAt: timestamppb.New(msg.Item.CreatedAt),
+				},
 			}
 			if err := stream.Send(res); err != nil {
 				log.Printf("failed to send stream response: res=%v, err=%v", res, err)

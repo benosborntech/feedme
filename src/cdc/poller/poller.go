@@ -70,16 +70,16 @@ func (p *Poller) fetchAndPublish(ctx context.Context) error {
 	}
 	defer rows.Close()
 
-	items := []types.Item{}
+	items := []*types.Item{}
 
 	for rows.Next() {
 		var item types.Item
-		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.UpdatedAt, &item.CreatedAt); err != nil {
 			log.Printf("failed to parse item, err=%v", err)
 
 			continue
 		}
-		items = append(items, item)
+		items = append(items, &item)
 	}
 
 	if len(items) == 0 {
@@ -90,10 +90,14 @@ func (p *Poller) fetchAndPublish(ctx context.Context) error {
 
 	// Publish the items to the stream for all precision levels
 	for _, item := range items {
+		if item == nil {
+			continue
+		}
+
 		for i := 1; i < len(item.Location); i++ {
 			key := item.Location[:i]
 			body, err := json.Marshal(types.Event{
-				Item: item,
+				Item: *item,
 			})
 			if err != nil {
 				log.Printf("failed to marshal body, err=%v", err)

@@ -10,6 +10,15 @@ service Updates {
     rpc GetUpdates(GetUpdatesRequest) returns (stream GetUpdatesResponse);
 }
 
+message ItemData {
+    int64 id = 1;
+    string location = 2;
+    int32 itemType = 3;
+    int32 quantity = 4;
+    google.protobuf.Timestamp updatedAt = 5;
+    google.protobuf.Timestamp createdAt = 6;
+}
+
 message GetUpdatesRequest {
     float longX = 1;
     float latY = 2;
@@ -17,9 +26,5 @@ message GetUpdatesRequest {
 }
 
 message GetUpdatesResponse {
-    int64 id = 1;
-    string location = 2;
-    int32 itemType = 3;
-    int32 quantity = 4;
-    google.protobuf.Timestamp createdAt = 5;
+    ItemData item = 1;
 }

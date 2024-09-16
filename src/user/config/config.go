@@ -5,12 +5,11 @@ import (
 	"os"
 
 	"github.com/benosborntech/feedme/updates/consts"
-	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
 	Port     string
-	RedisCfg *redis.Options
+	MySQLDSN string
 }
 
 func NewConfig() *Config {
@@ -23,17 +22,15 @@ func NewConfig() *Config {
 		log.Printf("using default port, port=%v", port)
 	}
 
-	redisAddr, ok := os.LookupEnv("REDIS_ADDR")
+	mySQLDSN, ok := os.LookupEnv("MYSQL_DSN")
 	if !ok {
-		log.Print("no redis addr provided")
+		log.Printf("no mysql dsn provided")
 	} else {
-		log.Printf("using redis addr, addr=%v", redisAddr)
+		log.Printf("using mysql dsn, dsn=%v", mySQLDSN)
 	}
 
 	return &Config{
-		Port: port,
-		RedisCfg: &redis.Options{
-			Addr: redisAddr,
-		},
+		Port:     port,
+		MySQLDSN: mySQLDSN,
 	}
 }
