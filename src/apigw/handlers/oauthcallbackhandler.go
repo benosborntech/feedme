@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/benosborntech/feedme/apigw/handlers/oauth"
 	"github.com/benosborntech/feedme/apigw/types"
 	commonTypes "github.com/benosborntech/feedme/common/types"
 	"github.com/benosborntech/feedme/pb"
-	"github.com/gofiber/fiber/v3"
 )
 
 type oauthCallbackHandlerBody struct {
@@ -29,34 +29,32 @@ func getUserId(serviceType types.ServiceType, sub string) int {
 	return int(userId)
 }
 
-func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
-		log.Printf("oauthCallbackHandler.req=%v", string(c.Body()))
-
-		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-
+func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var body oauthCallbackHandlerBody
-		if err := json.Unmarshal(c.Body(), &body); err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to unmarshal body, err=%v", err))
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, fmt.Sprintf("failed to unmarshal body, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
-		t, err := oauth.ExchangeToken(c.Context(), body.Code, body.State, body.Session)
+		t, err := oauth.ExchangeToken(r.Context(), body.Code, body.State, body.Session)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to get token, err=%v", err))
+			http.Error(w, fmt.Sprintf("failed to get token, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
 		log.Printf("got token, token=%v", t)
 
-		userInfo, err := oauth.GetUserInfo(c.Context(), t.AccessToken)
+		userInfo, err := oauth.GetUserInfo(r.Context(), t.AccessToken)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to get user info, err=%v", err))
+			http.Error(w, fmt.Sprintf("failed to get user info, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
 		userId := getUserId(oauth.GetServiceType(), userInfo.Sub)
 
-		// Create a user if they do not exist, or retrieve the existing one if they do
 		var user commonTypes.User
-		res, err := userClient.CreateUserIfNotExists(c.Context(), &pb.CreateUserIfNotExistsRequest{
+		res, err := userClient.CreateUserIfNotExists(r.Context(), &pb.CreateUserIfNotExistsRequest{
 			User: &pb.UserData{
 				Id:    int64(userId),
 				Email: userInfo.Email,
@@ -64,11 +62,12 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) func(c fi
 			},
 		})
 		if err != nil {
-			res, err := userClient.GetUser(c.Context(), &pb.GetUserRequest{
+			res, err := userClient.GetUser(r.Context(), &pb.GetUserRequest{
 				UserId: int64(userId),
 			})
 			if err != nil {
-				return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to get user, err=%v", err))
+				http.Error(w, fmt.Sprintf("failed to get user, err=%v", err), http.StatusInternalServerError)
+				return
 			}
 
 			user = commonTypes.User{
@@ -97,9 +96,12 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) func(c fi
 		}
 		payload, err := json.Marshal(token)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to marshal token, err=%v", err))
+			http.Error(w, fmt.Sprintf("failed to marshal token, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
-		return c.Status(fiber.StatusOK).SendString(string(payload))
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write(payload)
 	}
 }

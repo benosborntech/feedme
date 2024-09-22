@@ -3,10 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"net/http"
 
 	"github.com/benosborntech/feedme/apigw/handlers/oauth"
-	"github.com/gofiber/fiber/v3"
 )
 
 type handlerResponse struct {
@@ -14,26 +13,30 @@ type handlerResponse struct {
 	Session          string `json:"session"`
 }
 
-func GetOAuthEndpointHandler(oauth oauth.OAuth) func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
-		log.Printf("getOAuthEndpointHandleretOAuthHandler.req=%v", string(c.Body()))
-
-		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-
-		session, endpoint, err := oauth.GetEndpoint(c.Context())
+func GetOAuthEndpointHandler(oauth oauth.OAuth) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, endpoint, err := oauth.GetEndpoint(r.Context())
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to get redirect endpoint, err=%v", err))
+			http.Error(w, fmt.Sprintf("failed to get redirect endpoint, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
+		// Prepare the response
 		response := &handlerResponse{
 			RedirectEndpoint: endpoint,
 			Session:          session,
 		}
+
+		// Marshal the response to JSON
 		payload, err := json.Marshal(response)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("failed to marshal response, err=%v", err))
+			http.Error(w, fmt.Sprintf("failed to marshal response, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
-		return c.Status(fiber.StatusOK).SendString(string(payload))
+		// Send the JSON response
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		w.Write(payload)
 	}
 }

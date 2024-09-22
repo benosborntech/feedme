@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/handlers"
 	"github.com/benosborntech/feedme/apigw/handlers/oauth"
 	"github.com/benosborntech/feedme/pb"
-	"github.com/gofiber/fiber/v3"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -34,24 +34,20 @@ func main() {
 	defer userConn.Close()
 	userClient := pb.NewUserClient(userConn)
 
-	app := fiber.New()
-
 	// Register OAuth endpoints
 	oauthHandlers := []oauth.OAuth{
 		oauth.NewOAuthGoogle(client, cfg.GoogleOAuthConfig, cfg.BaseURL),
 	}
 	for _, handler := range oauthHandlers {
-		app.Get(handler.GetEndpointPath(), handlers.GetOAuthEndpointHandler(handler))
-		app.Post(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(handler, userClient))
+		http.HandleFunc(handler.GetEndpointPath(), handlers.GetOAuthEndpointHandler(handler))
+		http.HandleFunc(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(handler, userClient))
 	}
 
-	api := app.Group("/api")
-
-	api.Get("/updates", handlers.GetUpdatesHandler(updatesClient))
+	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 
-	if err := app.Listen(fmt.Sprintf(":%s", cfg.Port)); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.Port), nil); err != nil {
 		log.Fatalf("fatal server error, err=%v", err)
 	}
 }
