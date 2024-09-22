@@ -1,0 +1,7 @@
+**/.env
+
+**/.kube/config
+
+**/.terraform/*
+*.tfstate
+*.tfstate.*

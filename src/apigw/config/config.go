@@ -61,7 +61,7 @@ func NewConfig() *Config {
 	if !ok {
 		log.Print("no google client id provided")
 	} else {
-		log.Printf("using google client id, id=%v", googleClientId)
+		log.Printf("using google client id, id=%v***...***", googleClientId[:3])
 	}
 
 	googleClientSecret, ok := os.LookupEnv("GOOGLE_CLIENT_SECRET")

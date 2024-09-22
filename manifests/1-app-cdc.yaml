@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: cdc-deployment
+    labels:
+        app: feedme
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: cdc
+    template:
+        metadata:
+            labels:
+                app: cdc
+        spec:
+            containers:
+                - name: cdc
+                  image: feedme/cdc:latest
+                  imagePullPolicy: Never
+                  env:
+                      - name: REDIS_ADDR
+                        value: localhost:6379
+                      - name: MYSQL_DSN
+                        valueFrom:
+                            secretKeyRef:
+                                name: secrets
+                                key: mysql_dsn
