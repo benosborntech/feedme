@@ -1,15 +1,10 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 package user;
 
-option go_package = "./pb";
+import "google/protobuf/timestamp.proto";
 
-service User {
-    rpc GetUser(GetUserRequest) returns (GetUserResponse);
-    rpc CreateUserIfNotExists(CreateUserIfNotExistsRequest) returns (CreateUserIfNotExistsResponse);
-}
+option go_package = "./pb";
 
 message UserData {
     int64 id = 1;
@@ -17,20 +12,4 @@ message UserData {
     string name = 3;
     google.protobuf.Timestamp updatedAt = 4;
     google.protobuf.Timestamp createdAt = 5;
-}
-
-message GetUserRequest {
-    int64 userId = 1;
-}
-
-message GetUserResponse {
-    UserData user = 1;
-}
-
-message CreateUserIfNotExistsRequest {
-    UserData user = 1;
-}
-
-message CreateUserIfNotExistsResponse {
-    UserData user = 1;
 }

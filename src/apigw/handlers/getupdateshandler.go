@@ -71,6 +71,7 @@ func GetUpdatesHandler(updatesClient pb.UpdatesClient) http.HandlerFunc {
 						Location:  update.Item.Location,
 						ItemType:  int(update.Item.ItemType),
 						Quantity:  int(update.Item.Quantity),
+						ExpiresAt: update.Item.ExpiresAt.AsTime(),
 						UpdatedAt: update.Item.UpdatedAt.AsTime(),
 						CreatedAt: update.Item.CreatedAt.AsTime(),
 					},

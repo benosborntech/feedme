@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package userservice;
+
+import "user.proto";
+
+option go_package = "./pb";
+
+service User {
+    rpc GetUser(GetUserRequest) returns (GetUserResponse);
+    rpc CreateUserIfNotExists(CreateUserIfNotExistsRequest) returns (CreateUserIfNotExistsResponse);
+}
+
+message GetUserRequest {
+    int64 userId = 1;
+}
+
+message GetUserResponse {
+    user.UserData user = 1;
+}
+
+message CreateUserIfNotExistsRequest {
+    user.UserData user = 1;
+}
+
+message CreateUserIfNotExistsResponse {
+    user.UserData user = 1;
+}

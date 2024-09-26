@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.1
-// source: updates.proto
+// source: updatesservice.proto
 
 package pb
 
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Updates_GetUpdates_FullMethodName = "/updates.Updates/GetUpdates"
+	Updates_GetUpdates_FullMethodName = "/updatesservie.Updates/GetUpdates"
 )
 
 // UpdatesClient is the client API for Updates service.
@@ -110,7 +110,7 @@ type Updates_GetUpdatesServer = grpc.ServerStreamingServer[GetUpdatesResponse]
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Updates_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "updates.Updates",
+	ServiceName: "updatesservie.Updates",
 	HandlerType: (*UpdatesServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
@@ -120,5 +120,5 @@ var Updates_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "updates.proto",
+	Metadata: "updatesservice.proto",
 }

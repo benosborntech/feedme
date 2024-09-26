@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package updatesservie;
+
+import "item.proto";
+
+option go_package = "./pb";
+
+service Updates {
+    rpc GetUpdates(GetUpdatesRequest) returns (stream GetUpdatesResponse);
+}
+
+message GetUpdatesRequest {
+    float longX = 1;
+    float latY = 2;
+    float radius = 3;
+}
+
+message GetUpdatesResponse {
+    item.ItemData item = 1;
+}

@@ -165,3 +165,19 @@ func (o *OAuthGoogle) GetUserInfo(ctx context.Context, accessToken string) (*typ
 
 	return userInfo, nil
 }
+
+func (o *OAuthGoogle) RefreshToken(ctx context.Context, refreshToken string) (*oauth2.Token, error) {
+	token := &oauth2.Token{
+		RefreshToken: refreshToken,
+		TokenType:    "Bearer",
+	}
+
+	tokenSource := o.config.TokenSource(ctx, token)
+
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		return nil, fmt.Errorf("unable to refresh token: %w", err)
+	}
+
+	return newToken, nil
+}

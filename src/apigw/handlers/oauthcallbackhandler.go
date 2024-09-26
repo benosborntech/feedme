@@ -8,9 +8,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/benosborntech/feedme/apigw/handlers/oauth"
+	"github.com/benosborntech/feedme/apigw/oauth"
 	"github.com/benosborntech/feedme/apigw/types"
-	commonTypes "github.com/benosborntech/feedme/common/types"
 	"github.com/benosborntech/feedme/pb"
 )
 
@@ -53,8 +52,7 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.Hand
 
 		userId := getUserId(oauth.GetServiceType(), userInfo.Sub)
 
-		var user commonTypes.User
-		res, err := userClient.CreateUserIfNotExists(r.Context(), &pb.CreateUserIfNotExistsRequest{
+		_, err = userClient.CreateUserIfNotExists(r.Context(), &pb.CreateUserIfNotExistsRequest{
 			User: &pb.UserData{
 				Id:    int64(userId),
 				Email: userInfo.Email,
@@ -62,36 +60,15 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.Hand
 			},
 		})
 		if err != nil {
-			res, err := userClient.GetUser(r.Context(), &pb.GetUserRequest{
-				UserId: int64(userId),
-			})
-			if err != nil {
-				http.Error(w, fmt.Sprintf("failed to get user, err=%v", err), http.StatusInternalServerError)
-				return
-			}
-
-			user = commonTypes.User{
-				Id:        int(res.User.Id),
-				Email:     res.User.Email,
-				Name:      res.User.Name,
-				UpdatedAt: res.User.UpdatedAt.AsTime(),
-				CreatedAt: res.User.CreatedAt.AsTime(),
-			}
-		} else {
-			user = commonTypes.User{
-				Id:        int(res.User.Id),
-				Email:     res.User.Email,
-				Name:      res.User.Name,
-				UpdatedAt: res.User.UpdatedAt.AsTime(),
-				CreatedAt: res.User.CreatedAt.AsTime(),
-			}
+			http.Error(w, fmt.Sprintf("failed to get user, err=%v", err), http.StatusInternalServerError)
+			return
 		}
 
 		token := &types.Token{
 			AccessToken:  t.AccessToken,
 			RefreshToken: t.RefreshToken,
 			TokenType:    oauth.GetServiceType(),
-			User:         user,
+			UserId:       userId,
 			ExpiresAt:    t.Expiry,
 		}
 		payload, err := json.Marshal(token)

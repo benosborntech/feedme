@@ -7,7 +7,7 @@ import (
 
 	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/handlers"
-	"github.com/benosborntech/feedme/apigw/handlers/oauth"
+	"github.com/benosborntech/feedme/apigw/oauth"
 	"github.com/benosborntech/feedme/pb"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
@@ -44,6 +44,8 @@ func main() {
 	}
 
 	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))
+
+	// **** For the rest of these functions, we need some middleware that can check if our API token is valid and then refresh
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 

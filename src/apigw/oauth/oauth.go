@@ -14,4 +14,5 @@ type OAuth interface {
 	GetCallbackPath() string
 	ExchangeToken(ctx context.Context, code string, state string, session string) (*oauth2.Token, error)
 	GetUserInfo(ctx context.Context, accessToken string) (*types.UserInfo, error)
+	RefreshToken(ctx context.Context, refreshToken string) (*oauth2.Token, error)
 }

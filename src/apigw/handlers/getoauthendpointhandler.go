@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/benosborntech/feedme/apigw/handlers/oauth"
+	"github.com/benosborntech/feedme/apigw/oauth"
 )
 
 type handlerResponse struct {

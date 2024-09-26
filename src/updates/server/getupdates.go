@@ -85,6 +85,7 @@ func (s *UpdatesServer) GetUpdates(req *pb.GetUpdatesRequest, stream grpc.Server
 					Location:  msg.Item.Location,
 					ItemType:  int32(msg.Item.ItemType),
 					Quantity:  int32(msg.Item.Quantity),
+					ExpiresAt: timestamppb.New(msg.Item.ExpiresAt),
 					UpdatedAt: timestamppb.New(msg.Item.UpdatedAt),
 					CreatedAt: timestamppb.New(msg.Item.CreatedAt),
 				},

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS items (
     location CHAR(16),
     item_type INT,
     quantity INT,
+    expires_at TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

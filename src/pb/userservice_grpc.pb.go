@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.1
-// source: user.proto
+// source: userservice.proto
 
 package pb
 
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_GetUser_FullMethodName               = "/user.User/GetUser"
-	User_CreateUserIfNotExists_FullMethodName = "/user.User/CreateUserIfNotExists"
+	User_GetUser_FullMethodName               = "/userservice.User/GetUser"
+	User_CreateUserIfNotExists_FullMethodName = "/userservice.User/CreateUserIfNotExists"
 )
 
 // UserClient is the client API for User service.
@@ -142,7 +142,7 @@ func _User_CreateUserIfNotExists_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.User",
+	ServiceName: "userservice.User",
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -155,5 +155,5 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "user.proto",
+	Metadata: "userservice.proto",
 }

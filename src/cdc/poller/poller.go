@@ -74,7 +74,7 @@ func (p *Poller) fetchAndPublish(ctx context.Context) error {
 
 	for rows.Next() {
 		var item types.Item
-		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.UpdatedAt, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.ExpiresAt, &item.UpdatedAt, &item.CreatedAt); err != nil {
 			log.Printf("failed to parse item, err=%v", err)
 
 			continue
