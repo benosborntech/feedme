@@ -1,16 +1,18 @@
 package middleware
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"github.com/benosborntech/feedme/apigw/oauth"
+	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/types"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 )
 
-func InjectUserMiddleware(next func(types.Token) http.HandlerFunc) http.HandlerFunc {
+func InjectUserMiddleware(cfg config.Config, client *redis.Client, next func(userId int) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		authorization := r.Header.Get("Authorization")
@@ -25,29 +27,31 @@ func InjectUserMiddleware(next func(types.Token) http.HandlerFunc) http.HandlerF
 			return
 		}
 
-		// ***** We are currently not signing this token, it is currently just JSON
+		jwtToken := split[1]
+		parsedJwtToken, err := jwt.ParseWithClaims(jwtToken, &types.Claims{}, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
 
-		tokenRaw := split[1]
-		var token types.Token
-		err := json.Unmarshal([]byte(tokenRaw), &token)
+			return []byte(cfg.ServerSecret), nil
+		})
 		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to unmarshal token, err=%v", err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("failed to parse token, err=%v", err), http.StatusBadRequest)
+			return
+		}
+		claims, ok := parsedJwtToken.Claims.(*types.Claims)
+		if !ok || !parsedJwtToken.Valid {
+			http.Error(w, fmt.Sprintf("token is not valid, err=%v", err), http.StatusUnauthorized)
 			return
 		}
 
-		var oauthObj oauth.OAuth
-		switch token.TokenType {
-		case types.GoogleType:
-			oauthObj = oauth.NewOAuthGoogle()
-		default:
-			http.Error(w, fmt.Sprintf("unsupported token type, type=%v", token.TokenType), http.StatusBadRequest)
+		userId, err := strconv.Atoi(claims.RegisteredClaims.Subject)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("could not get user id, err=%v", err), http.StatusInternalServerError)
 			return
 		}
-
-		// **** Now we need to attempt to decode the token...
-		// **** We need to extra the details from the header, check the expiry and maybe refresh, then continue forward
 
 		// Execute the handler
-		next(token)(w, r)
+		next(userId)(w, r)
 	}
 }

@@ -8,15 +8,22 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/benosborntech/feedme/apigw/config"
+	"github.com/benosborntech/feedme/apigw/consts"
 	"github.com/benosborntech/feedme/apigw/oauth"
 	"github.com/benosborntech/feedme/apigw/types"
 	"github.com/benosborntech/feedme/pb"
+	"github.com/golang-jwt/jwt/v5"
 )
 
-type oauthCallbackHandlerBody struct {
+type oauthCallbackHandlerRequestBody struct {
 	Code    string `json:"code"`
 	State   string `json:"state"`
 	Session string `json:"session"`
+}
+
+type oauthCallbackHandlerResponseBody struct {
+	*types.Token
 }
 
 func getUserId(serviceType types.ServiceType, sub string) int {
@@ -28,9 +35,9 @@ func getUserId(serviceType types.ServiceType, sub string) int {
 	return int(userId)
 }
 
-func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.HandlerFunc {
+func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.UserClient) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var body oauthCallbackHandlerBody
+		var body oauthCallbackHandlerRequestBody
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, fmt.Sprintf("failed to unmarshal body, err=%v", err), http.StatusInternalServerError)
 			return
@@ -50,7 +57,10 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.Hand
 			return
 		}
 
+		refreshToken := t.RefreshToken
+		tokenType := oauth.GetServiceType()
 		userId := getUserId(oauth.GetServiceType(), userInfo.Sub)
+		expiresAt := t.Expiry
 
 		_, err = userClient.CreateUserIfNotExists(r.Context(), &pb.CreateUserIfNotExistsRequest{
 			User: &pb.UserData{
@@ -64,16 +74,31 @@ func OAuthCallbackHandler(oauth oauth.OAuth, userClient pb.UserClient) http.Hand
 			return
 		}
 
-		token := &types.Token{
-			AccessToken:  t.AccessToken,
-			RefreshToken: t.RefreshToken,
-			TokenType:    oauth.GetServiceType(),
-			UserId:       userId,
-			ExpiresAt:    t.Expiry,
+		claims := types.Claims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Issuer:    consts.JWT_ISSUER,
+				Subject:   fmt.Sprint(userId),
+				ExpiresAt: jwt.NewNumericDate(expiresAt),
+			},
 		}
-		payload, err := json.Marshal(token)
+		token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(cfg.ServerSecret))
 		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to marshal token, err=%v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("failed to sign token, err=%v", err), http.StatusInternalServerError)
+			return
+		}
+
+		response := &oauthCallbackHandlerResponseBody{
+			Token: &types.Token{
+				AccessToken:  token,
+				RefreshToken: refreshToken,
+				TokenType:    tokenType,
+				UserId:       userId,
+				ExpiresAt:    expiresAt,
+			},
+		}
+		payload, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to marshal response, err=%v", err), http.StatusInternalServerError)
 			return
 		}
 

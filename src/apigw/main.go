@@ -34,18 +34,20 @@ func main() {
 	defer userConn.Close()
 	userClient := pb.NewUserClient(userConn)
 
-	// Register OAuth endpoints
+	// Auth endpoints
 	oauthHandlers := []oauth.OAuth{
 		oauth.NewOAuthGoogle(client, cfg.GoogleOAuthConfig, cfg.BaseURL),
 	}
 	for _, handler := range oauthHandlers {
 		http.HandleFunc(handler.GetEndpointPath(), handlers.GetOAuthEndpointHandler(handler))
-		http.HandleFunc(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(handler, userClient))
+		http.HandleFunc(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(cfg, handler, userClient))
 	}
+	http.HandleFunc("/auth/refresh", handlers.RefreshTokenHandler())
 
+	// Public endpoints
 	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))
 
-	// **** For the rest of these functions, we need some middleware that can check if our API token is valid and then refresh
+	// Protected endpoints
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 

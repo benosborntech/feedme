@@ -8,4 +8,5 @@ const (
 	STATE_LENGTH   = 32
 	SESSION_LENGTH = 32
 	SESSION_EXPIRY = 5 * time.Minute
+	JWT_ISSUER     = "feedme"
 )
