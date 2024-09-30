@@ -42,7 +42,7 @@ func main() {
 		http.HandleFunc(handler.GetEndpointPath(), handlers.GetOAuthEndpointHandler(handler))
 		http.HandleFunc(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(cfg, handler, userClient))
 	}
-	http.HandleFunc("/auth/refresh", handlers.RefreshTokenHandler())
+	http.HandleFunc("/auth/refresh", handlers.RefreshTokenHandler(cfg, client))
 
 	// Public endpoints
 	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))

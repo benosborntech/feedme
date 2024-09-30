@@ -1,38 +1,20 @@
 package handlers
 
 import (
-	"crypto/sha256"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/benosborntech/feedme/apigw/config"
-	"github.com/benosborntech/feedme/apigw/consts"
 	"github.com/benosborntech/feedme/apigw/oauth"
-	"github.com/benosborntech/feedme/apigw/types"
+	"github.com/benosborntech/feedme/apigw/utils"
 	"github.com/benosborntech/feedme/pb"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type oauthCallbackHandlerRequestBody struct {
 	Code    string `json:"code"`
 	State   string `json:"state"`
 	Session string `json:"session"`
-}
-
-type oauthCallbackHandlerResponseBody struct {
-	*types.Token
-}
-
-func getUserId(serviceType types.ServiceType, sub string) int {
-	uniqueId := fmt.Sprintf("%s:%s", serviceType, sub)
-
-	hash := sha256.Sum256([]byte(uniqueId))
-	userId := binary.BigEndian.Uint64(hash[:8])
-
-	return int(userId)
 }
 
 func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.UserClient) http.HandlerFunc {
@@ -49,8 +31,6 @@ func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.U
 			return
 		}
 
-		log.Printf("got token, token=%v", t)
-
 		userInfo, err := oauth.GetUserInfo(r.Context(), t.AccessToken)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to get user info, err=%v", err), http.StatusInternalServerError)
@@ -59,7 +39,7 @@ func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.U
 
 		refreshToken := t.RefreshToken
 		tokenType := oauth.GetServiceType()
-		userId := getUserId(oauth.GetServiceType(), userInfo.Sub)
+		userId := utils.GetUserId(oauth.GetServiceType(), userInfo.Sub)
 		expiresAt := t.Expiry
 
 		_, err = userClient.CreateUserIfNotExists(r.Context(), &pb.CreateUserIfNotExistsRequest{
@@ -74,36 +54,11 @@ func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.U
 			return
 		}
 
-		claims := types.Claims{
-			RegisteredClaims: jwt.RegisteredClaims{
-				Issuer:    consts.JWT_ISSUER,
-				Subject:   fmt.Sprint(userId),
-				ExpiresAt: jwt.NewNumericDate(expiresAt),
-			},
-		}
-		token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(cfg.ServerSecret))
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to sign token, err=%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		response := &oauthCallbackHandlerResponseBody{
-			Token: &types.Token{
-				AccessToken:  token,
-				RefreshToken: refreshToken,
-				TokenType:    tokenType,
-				UserId:       userId,
-				ExpiresAt:    expiresAt,
-			},
-		}
-		payload, err := json.Marshal(response)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to marshal response, err=%v", err), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		w.Write(payload)
+		TokenHandler(cfg, w, r, &TokenHandlerRequestBody{
+			RefreshToken: refreshToken,
+			TokenType:    tokenType,
+			UserId:       userId,
+			ExpiresAt:    expiresAt,
+		})
 	}
 }

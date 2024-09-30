@@ -8,16 +8,13 @@ import (
 	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/oauth"
 	"github.com/benosborntech/feedme/apigw/types"
+	"github.com/benosborntech/feedme/apigw/utils"
 	"github.com/redis/go-redis/v9"
 )
 
 type refreshTokenHandlerRequestBody struct {
 	RefreshToken string            `json:"refreshToken"`
 	TokenType    types.ServiceType `json:"tokenType"`
-}
-
-type refreshTokenHandlerResponseBody struct {
-	*types.Token
 }
 
 func RefreshTokenHandler(cfg *config.Config, client *redis.Client) http.HandlerFunc {
@@ -37,17 +34,28 @@ func RefreshTokenHandler(cfg *config.Config, client *redis.Client) http.HandlerF
 			return
 		}
 
-		token, err := oauthHandler.RefreshToken(r.Context(), body.RefreshToken)
+		t, err := oauthHandler.RefreshToken(r.Context(), body.RefreshToken)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to refresh token, err=%v", err), http.StatusInternalServerError)
 			return
 		}
 
-		// **** Here I will generate a new refresh token for the user, fill it out with the required details, and do the rest
-		// **** Might come up with a function for creating the JWT if possible...
-
-		response := &refreshTokenHandlerResponseBody{
-			Token: &types.Token{},
+		userInfo, err := oauthHandler.GetUserInfo(r.Context(), t.AccessToken)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get user info, err=%v", err), http.StatusInternalServerError)
+			return
 		}
+
+		refreshToken := t.RefreshToken
+		tokenType := oauthHandler.GetServiceType()
+		userId := utils.GetUserId(oauthHandler.GetServiceType(), userInfo.Sub)
+		expiresAt := t.Expiry
+
+		TokenHandler(cfg, w, r, &TokenHandlerRequestBody{
+			RefreshToken: refreshToken,
+			TokenType:    tokenType,
+			UserId:       userId,
+			ExpiresAt:    expiresAt,
+		})
 	}
 }
