@@ -12,6 +12,8 @@ message ItemData {
     int32 itemType = 3;
     int32 quantity = 4;
     google.protobuf.Timestamp expiresAt = 5;
-    google.protobuf.Timestamp updatedAt = 6;
-    google.protobuf.Timestamp createdAt = 7;
+    int64 createdBy = 6;
+    int64 businessId = 7;
+    google.protobuf.Timestamp updatedAt = 8;
+    google.protobuf.Timestamp createdAt = 9;
 }

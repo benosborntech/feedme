@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package business;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pb";
+
+message BusinessData {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string latitude = 4;
+    string longitude = 5;
+    int64 createdBy = 6;
+    google.protobuf.Timestamp updatedAt = 7;
+    google.protobuf.Timestamp createdAt = 8;
+}

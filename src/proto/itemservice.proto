@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package itemservie;
+
+import "item.proto";
+
+option go_package = "./pb";
+
+service Item {
+    rpc GetItem(GetItemRequest) returns (GetItemResponse);
+    rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+}
+
+message GetItemRequest {
+    int64 itemId = 1;
+}
+
+message GetItemResponse {
+    item.ItemData item = 1;
+}
+
+message CreateItemRequest {
+    item.ItemData item = 1;
+}
+
+message CreateItemResponse {
+    item.ItemData item = 1;
+}

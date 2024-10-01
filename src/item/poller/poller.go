@@ -9,10 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/benosborntech/feedme/cdc/consts"
 	commonConsts "github.com/benosborntech/feedme/common/consts"
 	"github.com/benosborntech/feedme/common/types"
 	"github.com/benosborntech/feedme/common/utils"
+	"github.com/benosborntech/feedme/item/consts"
+	"github.com/benosborntech/feedme/item/dal"
 	"github.com/bsm/redislock"
 	"github.com/redis/go-redis/v9"
 )
@@ -64,22 +65,9 @@ func (p *Poller) fetchAndPublish(ctx context.Context) error {
 
 	prevTimestamp := time.Now().Add(-consts.DB_HISTORY_WINDOW)
 
-	rows, err := p.db.QueryContext(ctx, "SELECT * FROM items WHERE id >= ? AND created_at > ? ORDER BY created_at DESC", ctr, prevTimestamp)
+	items, err := dal.QueryItemFromUserIdAndTimestamp(ctx, p.db, ctr, prevTimestamp)
 	if err != nil {
 		return err
-	}
-	defer rows.Close()
-
-	items := []*types.Item{}
-
-	for rows.Next() {
-		var item types.Item
-		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.ExpiresAt, &item.UpdatedAt, &item.CreatedAt); err != nil {
-			log.Printf("failed to parse item, err=%v", err)
-
-			continue
-		}
-		items = append(items, &item)
 	}
 
 	if len(items) == 0 {
@@ -114,6 +102,7 @@ func (p *Poller) fetchAndPublish(ctx context.Context) error {
 	}
 
 	// Set the new counter - we use >= 0 since we need to start with zero, so we need the + 1
+	// This relies on us using auto increment for our id key
 	newCtr := items[0].Id + 1
 	if err := p.client.Set(ctx, counterKey, fmt.Sprint(newCtr), 0).Err(); err != nil {
 		return err

@@ -67,13 +67,15 @@ func GetUpdatesHandler(updatesClient pb.UpdatesClient) http.HandlerFunc {
 
 				event := &types.Event{
 					Item: types.Item{
-						Id:        int(update.Item.Id),
-						Location:  update.Item.Location,
-						ItemType:  int(update.Item.ItemType),
-						Quantity:  int(update.Item.Quantity),
-						ExpiresAt: update.Item.ExpiresAt.AsTime(),
-						UpdatedAt: update.Item.UpdatedAt.AsTime(),
-						CreatedAt: update.Item.CreatedAt.AsTime(),
+						Id:         int(update.Item.Id),
+						Location:   update.Item.Location,
+						ItemType:   int(update.Item.ItemType),
+						Quantity:   int(update.Item.Quantity),
+						ExpiresAt:  update.Item.ExpiresAt.AsTime(),
+						CreatedBy:  int(update.Item.CreatedBy),
+						BusinessId: int(update.Item.BusinessId),
+						UpdatedAt:  update.Item.UpdatedAt.AsTime(),
+						CreatedAt:  update.Item.CreatedAt.AsTime(),
 					},
 				}
 
