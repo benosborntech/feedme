@@ -20,8 +20,6 @@ func (i *ItemServer) CreateItem(ctx context.Context, req *pb.CreateItemRequest) 
 		ExpiresAt:  req.Item.ExpiresAt.AsTime(),
 		CreatedBy:  int(req.Item.CreatedBy),
 		BusinessId: int(req.Item.BusinessId),
-		UpdatedAt:  req.Item.UpdatedAt.AsTime(),
-		CreatedAt:  req.Item.CreatedAt.AsTime(),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("failed to create item: %v", err))

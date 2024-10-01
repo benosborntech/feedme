@@ -2,8 +2,27 @@ syntax = "proto3";
 
 package businessservice;
 
+import "business.proto";
+
 option go_package = "./pb";
 
 service Business {
+    rpc GetBusiness(GetBusinessRequest) returns (GetBusinessResponse);
+    rpc CreateBusiness(CreateBusinessRequest) returns (CreateBusinessResponse);
+}
 
+message GetBusinessRequest {
+    int64 businessId = 1;
+}
+
+message GetBusinessResponse {
+    business.BusinessData business = 1;
+}
+
+message CreateBusinessRequest {
+    business.BusinessData business = 1;
+}
+
+message CreateBusinessResponse {
+    business.BusinessData business = 1;
 }

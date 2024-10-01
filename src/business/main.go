@@ -23,7 +23,7 @@ func main() {
 	}
 	defer db.Close()
 
-	businessServer := businessserver.NewBusinessServer()
+	businessServer := businessserver.NewBusinessServer(db)
 
 	tcpListener, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -19,23 +20,267 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type GetBusinessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BusinessId int64 `protobuf:"varint,1,opt,name=businessId,proto3" json:"businessId,omitempty"`
+}
+
+func (x *GetBusinessRequest) Reset() {
+	*x = GetBusinessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_businessservice_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBusinessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBusinessRequest) ProtoMessage() {}
+
+func (x *GetBusinessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_businessservice_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBusinessRequest.ProtoReflect.Descriptor instead.
+func (*GetBusinessRequest) Descriptor() ([]byte, []int) {
+	return file_businessservice_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetBusinessRequest) GetBusinessId() int64 {
+	if x != nil {
+		return x.BusinessId
+	}
+	return 0
+}
+
+type GetBusinessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Business *BusinessData `protobuf:"bytes,1,opt,name=business,proto3" json:"business,omitempty"`
+}
+
+func (x *GetBusinessResponse) Reset() {
+	*x = GetBusinessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_businessservice_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetBusinessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBusinessResponse) ProtoMessage() {}
+
+func (x *GetBusinessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_businessservice_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBusinessResponse.ProtoReflect.Descriptor instead.
+func (*GetBusinessResponse) Descriptor() ([]byte, []int) {
+	return file_businessservice_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetBusinessResponse) GetBusiness() *BusinessData {
+	if x != nil {
+		return x.Business
+	}
+	return nil
+}
+
+type CreateBusinessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Business *BusinessData `protobuf:"bytes,1,opt,name=business,proto3" json:"business,omitempty"`
+}
+
+func (x *CreateBusinessRequest) Reset() {
+	*x = CreateBusinessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_businessservice_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateBusinessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBusinessRequest) ProtoMessage() {}
+
+func (x *CreateBusinessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_businessservice_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBusinessRequest.ProtoReflect.Descriptor instead.
+func (*CreateBusinessRequest) Descriptor() ([]byte, []int) {
+	return file_businessservice_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateBusinessRequest) GetBusiness() *BusinessData {
+	if x != nil {
+		return x.Business
+	}
+	return nil
+}
+
+type CreateBusinessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Business *BusinessData `protobuf:"bytes,1,opt,name=business,proto3" json:"business,omitempty"`
+}
+
+func (x *CreateBusinessResponse) Reset() {
+	*x = CreateBusinessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_businessservice_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateBusinessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBusinessResponse) ProtoMessage() {}
+
+func (x *CreateBusinessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_businessservice_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBusinessResponse.ProtoReflect.Descriptor instead.
+func (*CreateBusinessResponse) Descriptor() ([]byte, []int) {
+	return file_businessservice_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateBusinessResponse) GetBusiness() *BusinessData {
+	if x != nil {
+		return x.Business
+	}
+	return nil
+}
+
 var File_businessservice_proto protoreflect.FileDescriptor
 
 var file_businessservice_proto_rawDesc = []byte{
 	0x0a, 0x15, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0f, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73,
-	0x73, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x32, 0x0a, 0x0a, 0x08, 0x42, 0x75, 0x73, 0x69,
-	0x6e, 0x65, 0x73, 0x73, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x1a, 0x0e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65,
+	0x73, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x34, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x42,
+	0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e,
+	0x0a, 0x0a, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x0a, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x49, 0x64, 0x22, 0x49,
+	0x0a, 0x13, 0x47, 0x65, 0x74, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x32, 0x0a, 0x08, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73,
+	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65,
+	0x73, 0x73, 0x2e, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x44, 0x61, 0x74, 0x61, 0x52,
+	0x08, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x22, 0x4b, 0x0a, 0x15, 0x43, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x32, 0x0a, 0x08, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x2e,
+	0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x62, 0x75,
+	0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x22, 0x4c, 0x0a, 0x16, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x32, 0x0a, 0x08, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x16, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x2e, 0x42, 0x75,
+	0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x62, 0x75, 0x73, 0x69,
+	0x6e, 0x65, 0x73, 0x73, 0x32, 0xc7, 0x01, 0x0a, 0x08, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73,
+	0x73, 0x12, 0x58, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73,
+	0x12, 0x23, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x73, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x75, 0x73, 0x69, 0x6e,
+	0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x0e, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x12, 0x26, 0x2e,
+	0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x62, 0x75, 0x73, 0x69, 0x6e, 0x65, 0x73, 0x73,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x75,
+	0x73, 0x69, 0x6e, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x06,
+	0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_businessservice_proto_goTypes = []any{}
+var (
+	file_businessservice_proto_rawDescOnce sync.Once
+	file_businessservice_proto_rawDescData = file_businessservice_proto_rawDesc
+)
+
+func file_businessservice_proto_rawDescGZIP() []byte {
+	file_businessservice_proto_rawDescOnce.Do(func() {
+		file_businessservice_proto_rawDescData = protoimpl.X.CompressGZIP(file_businessservice_proto_rawDescData)
+	})
+	return file_businessservice_proto_rawDescData
+}
+
+var file_businessservice_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_businessservice_proto_goTypes = []any{
+	(*GetBusinessRequest)(nil),     // 0: businessservice.GetBusinessRequest
+	(*GetBusinessResponse)(nil),    // 1: businessservice.GetBusinessResponse
+	(*CreateBusinessRequest)(nil),  // 2: businessservice.CreateBusinessRequest
+	(*CreateBusinessResponse)(nil), // 3: businessservice.CreateBusinessResponse
+	(*BusinessData)(nil),           // 4: business.BusinessData
+}
 var file_businessservice_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: businessservice.GetBusinessResponse.business:type_name -> business.BusinessData
+	4, // 1: businessservice.CreateBusinessRequest.business:type_name -> business.BusinessData
+	4, // 2: businessservice.CreateBusinessResponse.business:type_name -> business.BusinessData
+	0, // 3: businessservice.Business.GetBusiness:input_type -> businessservice.GetBusinessRequest
+	2, // 4: businessservice.Business.CreateBusiness:input_type -> businessservice.CreateBusinessRequest
+	1, // 5: businessservice.Business.GetBusiness:output_type -> businessservice.GetBusinessResponse
+	3, // 6: businessservice.Business.CreateBusiness:output_type -> businessservice.CreateBusinessResponse
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_businessservice_proto_init() }
@@ -43,18 +288,70 @@ func file_businessservice_proto_init() {
 	if File_businessservice_proto != nil {
 		return
 	}
+	file_business_proto_init()
+	if !protoimpl.UnsafeEnabled {
+		file_businessservice_proto_msgTypes[0].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBusinessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_businessservice_proto_msgTypes[1].Exporter = func(v any, i int) any {
+			switch v := v.(*GetBusinessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_businessservice_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateBusinessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_businessservice_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateBusinessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_businessservice_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_businessservice_proto_goTypes,
 		DependencyIndexes: file_businessservice_proto_depIdxs,
+		MessageInfos:      file_businessservice_proto_msgTypes,
 	}.Build()
 	File_businessservice_proto = out.File
 	file_businessservice_proto_rawDesc = nil
