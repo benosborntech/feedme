@@ -12,21 +12,21 @@ import (
 )
 
 func (b *BusinessServer) GetBusiness(ctx context.Context, req *pb.GetBusinessRequest) (*pb.GetBusinessResponse, error) {
-	item, err := dal.QueryBusinessById(ctx, b.db, int(req.BusinessId))
+	business, err := dal.QueryBusinessById(ctx, b.db, int(req.BusinessId))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("failed to get business: %v", err))
 	}
 
 	return &pb.GetBusinessResponse{
 		Business: &pb.BusinessData{
-			Id:          int64(item.Id),
-			Name:        item.Name,
-			Description: item.Description,
-			Latitude:    item.Latitude,
-			Longitude:   item.Longitude,
-			CreatedBy:   int64(item.CreatedBy),
-			UpdatedAt:   timestamppb.New(item.UpdatedAt),
-			CreatedAt:   timestamppb.New(item.CreatedAt),
+			Id:          int64(business.Id),
+			Name:        business.Name,
+			Description: business.Description,
+			Latitude:    business.Latitude,
+			Longitude:   business.Longitude,
+			CreatedBy:   int64(business.CreatedBy),
+			UpdatedAt:   timestamppb.New(business.UpdatedAt),
+			CreatedAt:   timestamppb.New(business.CreatedAt),
 		},
 	}, nil
 }

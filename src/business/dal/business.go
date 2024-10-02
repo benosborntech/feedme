@@ -32,3 +32,23 @@ func CreateBusiness(ctx context.Context, db *sql.DB, business *types.Business) (
 
 	return &outBusiness, nil
 }
+
+func QueryBusiness(ctx context.Context, db *sql.DB, page int, pageSize int) ([]*types.Business, error) {
+	rows, err := db.QueryContext(ctx, "SELECT * FROM businesses LIMIT ? OFFSET ? ORDER BY id", page, page*pageSize)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	businesses := []*types.Business{}
+
+	for rows.Next() {
+		var business types.Business
+		if err := rows.Scan(&business.Id, &business.Name, &business.Description, &business.Latitude, &business.Longitude, &business.CreatedBy, &business.UpdatedAt, &business.CreatedAt); err != nil {
+			return nil, err
+		}
+		businesses = append(businesses, &business)
+	}
+
+	return businesses, nil
+}

@@ -9,6 +9,7 @@ option go_package = "./pb";
 service Business {
     rpc GetBusiness(GetBusinessRequest) returns (GetBusinessResponse);
     rpc CreateBusiness(CreateBusinessRequest) returns (CreateBusinessResponse);
+    rpc QueryBusiness(QueryBusinessRequest) returns (QueryBusinessResponse);
 }
 
 message GetBusinessRequest {
@@ -25,4 +26,13 @@ message CreateBusinessRequest {
 
 message CreateBusinessResponse {
     business.BusinessData business = 1;
+}
+
+message QueryBusinessRequest {
+    int32 page = 1;
+    int32 pageSize = 2;
+}
+
+message QueryBusinessResponse {
+    repeated business.BusinessData business = 1;
 }

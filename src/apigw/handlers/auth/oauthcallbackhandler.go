@@ -1,4 +1,4 @@
-package handlers
+package authhandlers
 
 import (
 	"encoding/json"
@@ -54,7 +54,7 @@ func OAuthCallbackHandler(cfg *config.Config, oauth oauth.OAuth, userClient pb.U
 			return
 		}
 
-		TokenHandler(cfg, w, r, &TokenHandlerRequestBody{
+		TokenHandler(cfg, w, r, &tokenHandlerRequestBody{
 			RefreshToken: refreshToken,
 			TokenType:    tokenType,
 			UserId:       userId,

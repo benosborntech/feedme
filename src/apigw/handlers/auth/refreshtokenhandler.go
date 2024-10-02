@@ -1,4 +1,4 @@
-package handlers
+package authhandlers
 
 import (
 	"encoding/json"
@@ -51,7 +51,7 @@ func RefreshTokenHandler(cfg *config.Config, client *redis.Client) http.HandlerF
 		userId := utils.GetUserId(oauthHandler.GetServiceType(), userInfo.Sub)
 		expiresAt := t.Expiry
 
-		TokenHandler(cfg, w, r, &TokenHandlerRequestBody{
+		TokenHandler(cfg, w, r, &tokenHandlerRequestBody{
 			RefreshToken: refreshToken,
 			TokenType:    tokenType,
 			UserId:       userId,

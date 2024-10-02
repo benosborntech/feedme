@@ -12,7 +12,7 @@ import (
 	"github.com/benosborntech/feedme/pb"
 )
 
-type updateBody struct {
+type getUpdatesHandlerRequestBody struct {
 	LongX  float32 `json:"longX"`
 	LatY   float32 `json:"latY"`
 	Radius float32 `json:"radius"`
@@ -20,7 +20,7 @@ type updateBody struct {
 
 func GetUpdatesHandler(updatesClient pb.UpdatesClient) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var body updateBody
+		var body getUpdatesHandlerRequestBody
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, fmt.Sprintf("failed to unmarshal body, err=%v", err), http.StatusInternalServerError)
 			return

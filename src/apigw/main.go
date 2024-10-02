@@ -7,6 +7,7 @@ import (
 
 	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/handlers"
+	authhandlers "github.com/benosborntech/feedme/apigw/handlers/auth"
 	"github.com/benosborntech/feedme/apigw/oauth"
 	"github.com/benosborntech/feedme/pb"
 	"github.com/redis/go-redis/v9"
@@ -34,18 +35,26 @@ func main() {
 	defer userConn.Close()
 	userClient := pb.NewUserClient(userConn)
 
+	businessConn, err := grpc.NewClient(cfg.BusinessAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to start updates conn, err=%v", err)
+	}
+	defer businessConn.Close()
+	businessClient := pb.NewBusinessClient(businessConn)
+
 	// Auth endpoints
 	oauthHandlers := []oauth.OAuth{
 		oauth.NewOAuthGoogle(client, cfg.GoogleOAuthConfig, cfg.BaseURL),
 	}
 	for _, handler := range oauthHandlers {
-		http.HandleFunc(handler.GetEndpointPath(), handlers.GetOAuthEndpointHandler(handler))
-		http.HandleFunc(handler.GetCallbackPath(), handlers.OAuthCallbackHandler(cfg, handler, userClient))
+		http.HandleFunc(handler.GetEndpointPath(), authhandlers.GetOAuthEndpointHandler(handler))
+		http.HandleFunc(handler.GetCallbackPath(), authhandlers.OAuthCallbackHandler(cfg, handler, userClient))
 	}
-	http.HandleFunc("/auth/refresh", handlers.RefreshTokenHandler(cfg, client))
+	http.HandleFunc("/auth/refresh", authhandlers.RefreshTokenHandler(cfg, client))
 
 	// Public endpoints
 	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))
+	http.HandleFunc("/api/business", handlers.GetBusinessesHandler(businessClient))
 
 	// Protected endpoints
 

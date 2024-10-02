@@ -3,7 +3,6 @@ package dal
 import (
 	"context"
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/benosborntech/feedme/common/types"
@@ -47,9 +46,7 @@ func QueryItemFromUserIdAndTimestamp(ctx context.Context, db *sql.DB, idFrom int
 	for rows.Next() {
 		var item types.Item
 		if err := rows.Scan(&item.Id, &item.Location, &item.ItemType, &item.Quantity, &item.ExpiresAt, &item.CreatedBy, &item.BusinessId, &item.UpdatedAt, &item.CreatedAt); err != nil {
-			log.Printf("failed to parse item, err=%v", err)
-
-			continue
+			return nil, err
 		}
 		items = append(items, &item)
 	}

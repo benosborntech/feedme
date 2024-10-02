@@ -1,4 +1,4 @@
-package handlers
+package authhandlers
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type TokenHandlerRequestBody struct {
+type tokenHandlerRequestBody struct {
 	RefreshToken string
 	TokenType    types.ServiceType
 	UserId       int
@@ -23,7 +23,7 @@ type tokenHandlerResponseBody struct {
 	*types.Token
 }
 
-func TokenHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request, params *TokenHandlerRequestBody) {
+func TokenHandler(cfg *config.Config, w http.ResponseWriter, r *http.Request, params *tokenHandlerRequestBody) {
 	claims := types.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    consts.JWT_ISSUER,

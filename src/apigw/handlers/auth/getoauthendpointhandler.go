@@ -1,4 +1,4 @@
-package handlers
+package authhandlers
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"github.com/benosborntech/feedme/apigw/oauth"
 )
 
-type handlerResponse struct {
+type getOAuthEndpointHandlerResponseBody struct {
 	RedirectEndpoint string `json:"redirectEndpoint"`
 	Session          string `json:"session"`
 }
@@ -22,7 +22,7 @@ func GetOAuthEndpointHandler(oauth oauth.OAuth) http.HandlerFunc {
 		}
 
 		// Prepare the response
-		response := &handlerResponse{
+		response := &getOAuthEndpointHandlerResponseBody{
 			RedirectEndpoint: endpoint,
 			Session:          session,
 		}

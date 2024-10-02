@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Business_GetBusiness_FullMethodName    = "/businessservice.Business/GetBusiness"
 	Business_CreateBusiness_FullMethodName = "/businessservice.Business/CreateBusiness"
+	Business_QueryBusiness_FullMethodName  = "/businessservice.Business/QueryBusiness"
 )
 
 // BusinessClient is the client API for Business service.
@@ -29,6 +30,7 @@ const (
 type BusinessClient interface {
 	GetBusiness(ctx context.Context, in *GetBusinessRequest, opts ...grpc.CallOption) (*GetBusinessResponse, error)
 	CreateBusiness(ctx context.Context, in *CreateBusinessRequest, opts ...grpc.CallOption) (*CreateBusinessResponse, error)
+	QueryBusiness(ctx context.Context, in *QueryBusinessRequest, opts ...grpc.CallOption) (*QueryBusinessResponse, error)
 }
 
 type businessClient struct {
@@ -59,12 +61,23 @@ func (c *businessClient) CreateBusiness(ctx context.Context, in *CreateBusinessR
 	return out, nil
 }
 
+func (c *businessClient) QueryBusiness(ctx context.Context, in *QueryBusinessRequest, opts ...grpc.CallOption) (*QueryBusinessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryBusinessResponse)
+	err := c.cc.Invoke(ctx, Business_QueryBusiness_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BusinessServer is the server API for Business service.
 // All implementations must embed UnimplementedBusinessServer
 // for forward compatibility.
 type BusinessServer interface {
 	GetBusiness(context.Context, *GetBusinessRequest) (*GetBusinessResponse, error)
 	CreateBusiness(context.Context, *CreateBusinessRequest) (*CreateBusinessResponse, error)
+	QueryBusiness(context.Context, *QueryBusinessRequest) (*QueryBusinessResponse, error)
 	mustEmbedUnimplementedBusinessServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedBusinessServer) GetBusiness(context.Context, *GetBusinessRequ
 }
 func (UnimplementedBusinessServer) CreateBusiness(context.Context, *CreateBusinessRequest) (*CreateBusinessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBusiness not implemented")
+}
+func (UnimplementedBusinessServer) QueryBusiness(context.Context, *QueryBusinessRequest) (*QueryBusinessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryBusiness not implemented")
 }
 func (UnimplementedBusinessServer) mustEmbedUnimplementedBusinessServer() {}
 func (UnimplementedBusinessServer) testEmbeddedByValue()                  {}
@@ -138,6 +154,24 @@ func _Business_CreateBusiness_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Business_QueryBusiness_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryBusinessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BusinessServer).QueryBusiness(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Business_QueryBusiness_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BusinessServer).QueryBusiness(ctx, req.(*QueryBusinessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Business_ServiceDesc is the grpc.ServiceDesc for Business service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var Business_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateBusiness",
 			Handler:    _Business_CreateBusiness_Handler,
+		},
+		{
+			MethodName: "QueryBusiness",
+			Handler:    _Business_QueryBusiness_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
