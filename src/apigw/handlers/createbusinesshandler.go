@@ -36,7 +36,7 @@ func CreateBusinessesHandler(businessClient pb.BusinessClient) func(userId int) 
 				},
 			})
 			if err != nil {
-				http.Error(w, fmt.Sprintf("failed to query business, err=%v", err), http.StatusInternalServerError)
+				http.Error(w, fmt.Sprintf("failed to create business, err=%v", err), http.StatusInternalServerError)
 				return
 			}
 

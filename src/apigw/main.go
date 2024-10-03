@@ -32,17 +32,24 @@ func main() {
 
 	userConn, err := grpc.NewClient(cfg.UpdatesAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to start updates conn, err=%v", err)
+		log.Fatalf("failed to start user conn, err=%v", err)
 	}
 	defer userConn.Close()
 	userClient := pb.NewUserClient(userConn)
 
 	businessConn, err := grpc.NewClient(cfg.BusinessAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to start updates conn, err=%v", err)
+		log.Fatalf("failed to start business conn, err=%v", err)
 	}
 	defer businessConn.Close()
 	businessClient := pb.NewBusinessClient(businessConn)
+
+	itemConn, err := grpc.NewClient(cfg.ItemAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to start item conn, err=%v", err)
+	}
+	defer itemConn.Close()
+	itemClient := pb.NewItemClient(itemConn)
 
 	httpHandler := utils.NewHTTPUtil()
 
@@ -57,11 +64,12 @@ func main() {
 	httpHandler.Post("/auth/refresh", authhandlers.RefreshTokenHandler(cfg, client))
 
 	// Public endpoints
-	httpHandler.Get("/api/updates", handlers.GetUpdatesHandler(updatesClient))
+	httpHandler.Get("/api/updates/live", handlers.GetUpdatesHandler(updatesClient))
 	httpHandler.Get("/api/business", handlers.GetBusinessesHandler(businessClient))
 
 	// Protected endpoints
 	httpHandler.Post("/api/business", middleware.InjectUserMiddleware(cfg, client, handlers.CreateBusinessesHandler(businessClient)))
+	httpHandler.Post("/api/item", middleware.InjectUserMiddleware(cfg, client, handlers.CreateItemHandler(itemClient)))
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 

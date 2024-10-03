@@ -14,6 +14,7 @@ type Config struct {
 	UpdatesAddr       string
 	UserAddr          string
 	BusinessAddr      string
+	ItemAddr          string
 	BaseURL           string
 	ServerSecret      string
 	RedisCfg          *redis.Options
@@ -49,6 +50,13 @@ func NewConfig() *Config {
 		log.Print("no business addr provided")
 	} else {
 		log.Printf("using business addr, addr=%v", businessAddr)
+	}
+
+	itemAddr, ok := os.LookupEnv("ITEM_ADDR")
+	if !ok {
+		log.Print("no item addr provided")
+	} else {
+		log.Printf("using item addr, addr=%v", itemAddr)
 	}
 
 	redisAddr, ok := os.LookupEnv("REDIS_ADDR")
@@ -91,6 +99,7 @@ func NewConfig() *Config {
 		UpdatesAddr:  updatesAddr,
 		UserAddr:     userAddr,
 		BusinessAddr: businessAddr,
+		ItemAddr:     itemAddr,
 		BaseURL:      baseURL,
 		ServerSecret: serverSecret,
 		RedisCfg: &redis.Options{
