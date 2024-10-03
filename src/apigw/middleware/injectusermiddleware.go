@@ -12,9 +12,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func InjectUserMiddleware(cfg config.Config, client *redis.Client, next func(userId int) http.HandlerFunc) http.HandlerFunc {
+func InjectUserMiddleware(cfg *config.Config, client *redis.Client, next func(userId int) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		authorization := r.Header.Get("Authorization")
 		if authorization == "" {
 			http.Error(w, "no authorization header", http.StatusUnauthorized)

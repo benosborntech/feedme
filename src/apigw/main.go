@@ -8,7 +8,9 @@ import (
 	"github.com/benosborntech/feedme/apigw/config"
 	"github.com/benosborntech/feedme/apigw/handlers"
 	authhandlers "github.com/benosborntech/feedme/apigw/handlers/auth"
+	"github.com/benosborntech/feedme/apigw/middleware"
 	"github.com/benosborntech/feedme/apigw/oauth"
+	"github.com/benosborntech/feedme/apigw/utils"
 	"github.com/benosborntech/feedme/pb"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
@@ -42,25 +44,28 @@ func main() {
 	defer businessConn.Close()
 	businessClient := pb.NewBusinessClient(businessConn)
 
+	httpHandler := utils.NewHTTPUtil()
+
 	// Auth endpoints
 	oauthHandlers := []oauth.OAuth{
 		oauth.NewOAuthGoogle(client, cfg.GoogleOAuthConfig, cfg.BaseURL),
 	}
 	for _, handler := range oauthHandlers {
-		http.HandleFunc(handler.GetEndpointPath(), authhandlers.GetOAuthEndpointHandler(handler))
-		http.HandleFunc(handler.GetCallbackPath(), authhandlers.OAuthCallbackHandler(cfg, handler, userClient))
+		httpHandler.Get(handler.GetEndpointPath(), authhandlers.GetOAuthEndpointHandler(handler))
+		httpHandler.Get(handler.GetCallbackPath(), authhandlers.OAuthCallbackHandler(cfg, handler, userClient))
 	}
-	http.HandleFunc("/auth/refresh", authhandlers.RefreshTokenHandler(cfg, client))
+	httpHandler.Post("/auth/refresh", authhandlers.RefreshTokenHandler(cfg, client))
 
 	// Public endpoints
-	http.HandleFunc("/api/updates", handlers.GetUpdatesHandler(updatesClient))
-	http.HandleFunc("/api/business", handlers.GetBusinessesHandler(businessClient))
+	httpHandler.Get("/api/updates", handlers.GetUpdatesHandler(updatesClient))
+	httpHandler.Get("/api/business", handlers.GetBusinessesHandler(businessClient))
 
 	// Protected endpoints
+	httpHandler.Post("/api/business", middleware.InjectUserMiddleware(cfg, client, handlers.CreateBusinessesHandler(businessClient)))
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.Port), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.Port), httpHandler.GetHandler()); err != nil {
 		log.Fatalf("fatal server error, err=%v", err)
 	}
 }
