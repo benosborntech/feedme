@@ -2,22 +2,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: cdc-deployment
+    name: item-deployment
     labels:
         app: feedme
 spec:
     replicas: 1
     selector:
         matchLabels:
-            app: cdc
+            app: item
     template:
         metadata:
             labels:
-                app: cdc
+                app: item
         spec:
             containers:
-                - name: cdc
-                  image: feedme/cdc:latest
+                - name: item
+                  image: feedme/item:latest
                   imagePullPolicy: Never
                   env:
                       - name: REDIS_ADDR
@@ -27,3 +27,18 @@ spec:
                             secretKeyRef:
                                 name: secrets
                                 key: mysql_dsn
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: item-service
+    labels:
+        app: feedme
+spec:
+    type: LoadBalancer
+    ports:
+        - port: 3000
+          targetPort: 3000
+    selector:
+        app: item

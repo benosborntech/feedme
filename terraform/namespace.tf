@@ -1,6 +1,6 @@
-resource "kubernetes_namespace" "dev" {
+resource "kubernetes_namespace" "app" {
   metadata {
-    name = "dev"
+    name = "app"
   }
 }
 
