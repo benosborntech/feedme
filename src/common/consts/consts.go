@@ -12,5 +12,5 @@ const (
 	WORLD_CIRCUMFERENCE = 40075000.0
 	MIN_RADIUS          = 5     // metres
 	MAX_RADIUS          = 20000 // metres
-	MAX_PRECISION       = 16
+	MAX_PRECISION       = 12
 )

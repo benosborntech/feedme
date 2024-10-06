@@ -69,7 +69,7 @@ func main() {
 
 	// Protected endpoints
 	httpHandler.Post("/api/business", middleware.InjectUserMiddleware(cfg, client, handlers.CreateBusinessesHandler(businessClient)))
-	httpHandler.Post("/api/item", middleware.InjectUserMiddleware(cfg, client, handlers.CreateItemHandler(itemClient)))
+	httpHandler.Post("/api/item", middleware.InjectUserMiddleware(cfg, client, handlers.CreateItemHandler(itemClient, businessClient)))
 
 	log.Printf("started server, addr=http://localhost:%s", cfg.Port)
 
