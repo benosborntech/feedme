@@ -27,7 +27,7 @@ runapigw:
 
 # Infra
 infra:
-	source .env && cd terraform && terraform apply -var="google_client_id=$$GOOGLE_CLIENT_ID" -var="google_client_secret=$$GOOGLE_CLIENT_SECRET" -var="server_secret=helloworld" -var="mysql_dsn=user:pass123@tcp(localhost:3306)/db"
+	source .env && cd terraform && terraform apply -var="google_client_id=$$GOOGLE_CLIENT_ID" -var="google_client_secret=$$GOOGLE_CLIENT_SECRET" -var="server_secret=helloworld" -var="mysql_dsn=user:pass123@tcp(localhost:3306)/db" -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
 
 kapply:
 	kubectl apply -f ./manifests --prune -n dev --selector app=feedme

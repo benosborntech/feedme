@@ -27,7 +27,7 @@ resource "kubernetes_secret" "docker_registry_secret" {
 resource "digitalocean_kubernetes_cluster" "cluster" {
   name    = "feedme-cluster"
   region  = var.do_region
-  version = "1.29.1-do.0"
+  version = "1.31.1-do.1"
 
   node_pool {
     name       = "feedme-worker-pool"
@@ -41,7 +41,7 @@ resource "digitalocean_kubernetes_cluster" "cluster" {
 # Load balancer
 resource "digitalocean_loadbalancer" "ingress_load_balancer" {
   name   = "feedme-lb"
-  region = var.region
+  region = var.do_region
   size   = "lb-small"
 
   forwarding_rule {
