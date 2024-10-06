@@ -6,7 +6,6 @@ require (
 	github.com/bsm/redislock v0.9.4
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/mattn/go-sqlite3 v1.14.23
 	github.com/pierrre/geohash v1.1.2
 	github.com/redis/go-redis/v9 v9.6.1
 	golang.org/x/oauth2 v0.21.0
