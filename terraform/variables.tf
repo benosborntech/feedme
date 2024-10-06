@@ -36,3 +36,13 @@ variable "do_region" {
   type    = string
   default = "syd1"
 }
+
+variable "tld" {
+  type    = string
+  default = "benosborn.tech"
+}
+
+variable "subdomain" {
+  type    = string
+  default = "feedme"
+}
