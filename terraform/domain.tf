@@ -2,13 +2,18 @@ resource "digitalocean_domain" "domain" {
   name = var.tld
 }
 
-resource "digitalocean_record" "a_records" {
+resource "digitalocean_record" "a_record" {
   domain = digitalocean_domain.domain.id
   type   = "A"
   ttl    = 60
-  name   = var.subdomain
+  name   = "@"
   value  = digitalocean_loadbalancer.ingress_load_balancer.ip
-  depends_on = [
-    digitalocean_domain.domain
-  ]
+}
+
+resource "digitalocean_record" "cname_record" {
+  domain = digitalocean_domain.domain.id
+  type   = "CNAME"
+  ttl    = 60
+  name   = "www"
+  value  = "@"
 }

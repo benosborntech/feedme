@@ -1,11 +1,5 @@
-resource "kubernetes_namespace" "app" {
+resource "kubernetes_namespace" "ingress" {
   metadata {
-    name = "app"
-  }
-}
-
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "monitoring"
+    name = "ingress-nginx"
   }
 }

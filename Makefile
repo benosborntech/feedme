@@ -26,8 +26,17 @@ runapigw:
 	cd src/apigw && PORT=3003 UPDATES_ADDR=localhost:3001 USER_ADDR=localhost:3002 REDIS_ADDR=localhost:6379 BASE_URL=localhost:8080 GOOGLE_CLIENT_ID=CLIENT_ID_HERE GOOGLE_CLIENT_SECRET=CLIENT_SECRET_HERE SERVER_SECRET=helloworld go run main.go
 
 # Infra
-infra:
-	source .env && cd terraform && terraform apply -var="google_client_id=$$GOOGLE_CLIENT_ID" -var="google_client_secret=$$GOOGLE_CLIENT_SECRET" -var="server_secret=helloworld" -var="mysql_dsn=user:pass123@tcp(localhost:3306)/db" -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
+# infraup:
+# 	source .env && cd terraform && terraform apply -var="google_client_id=$$GOOGLE_CLIENT_ID" -var="google_client_secret=$$GOOGLE_CLIENT_SECRET" -var="server_secret=helloworld" -var="mysql_dsn=user:pass123@tcp(localhost:3306)/db" -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
+
+infraup:
+	source .env && cd terraform && terraform apply -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
+
+# infradown:
+# 	source .env && cd terraform && terraform destroy -var="google_client_id=$$GOOGLE_CLIENT_ID" -var="google_client_secret=$$GOOGLE_CLIENT_SECRET" -var="server_secret=helloworld" -var="mysql_dsn=user:pass123@tcp(localhost:3306)/db" -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
+
+infradown:
+	source .env && cd terraform && terraform destroy -var="do_token=$$DO_TOKEN" -var="do_user=$$DO_USER"
 
 kapply:
 	kubectl apply -f ./manifests --prune -n app --selector app=feedme

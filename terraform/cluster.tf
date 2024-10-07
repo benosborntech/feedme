@@ -1,28 +1,3 @@
-# Container registry
-resource "digitalocean_container_registry" "container_registry" {
-  name                   = "feedmecr"
-  subscription_tier_slug = "basic"
-}
-
-resource "kubernetes_secret" "docker_registry_secret" {
-  metadata {
-    name      = "dockercred"
-    namespace = kubernetes_namespace.app.metadata[0].name
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "registry.digitalocean.com" = {
-          auth = base64encode("${var.do_user}:${var.do_token}")
-        }
-      }
-    })
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}
-
 # Cluster
 resource "digitalocean_kubernetes_cluster" "cluster" {
   name    = "feedme-cluster"
@@ -38,7 +13,6 @@ resource "digitalocean_kubernetes_cluster" "cluster" {
   }
 }
 
-# Load balancer
 resource "digitalocean_loadbalancer" "ingress_load_balancer" {
   name   = "feedme-lb"
   region = var.do_region
@@ -62,7 +36,7 @@ resource "digitalocean_loadbalancer" "ingress_load_balancer" {
 
 resource "helm_release" "nginx_ingress_chart" {
   name       = "nginx-ingress-controller"
-  namespace  = kubernetes_namespace.app.metadata[0].name
+  namespace  = kubernetes_namespace.ingress.metadata[0].name
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "nginx-ingress-controller"
   set {
@@ -76,38 +50,4 @@ resource "helm_release" "nginx_ingress_chart" {
   depends_on = [
     digitalocean_loadbalancer.ingress_load_balancer,
   ]
-}
-
-# Certificates
-resource "helm_release" "cert-manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "v1.0.1"
-  namespace  = kubernetes_namespace.app.metadata[0].name
-  timeout    = 120
-  depends_on = [
-    kubernetes_ingress_v1.default_cluster_ingress,
-  ]
-  set {
-    name  = "createCustomResource"
-    value = "true"
-  }
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-}
-
-resource "helm_release" "cluster-issuer" {
-  name      = "cluster-issuer"
-  chart     = "./charts/cluster-issuer"
-  namespace = kubernetes_namespace.app.metadata[0].name
-  depends_on = [
-    helm_release.cert-manager,
-  ]
-  set {
-    name  = "letsencrypt_email"
-    value = var.do_user
-  }
 }
