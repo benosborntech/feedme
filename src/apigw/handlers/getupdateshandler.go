@@ -7,30 +7,37 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/benosborntech/feedme/common/types"
 	"github.com/benosborntech/feedme/pb"
 )
 
-type getUpdatesHandlerRequestBody struct {
-	LongX  float32 `json:"longX"`
-	LatY   float32 `json:"latY"`
-	Radius float32 `json:"radius"`
-}
-
 func GetUpdatesHandler(updatesClient pb.UpdatesClient) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var body getUpdatesHandlerRequestBody
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, fmt.Sprintf("failed to unmarshal body, err=%v", err), http.StatusInternalServerError)
+		longX, err := strconv.ParseFloat(r.URL.Query().Get("longX"), 32)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get long x, err=%v", err), http.StatusBadRequest)
+			return
+		}
+
+		latY, err := strconv.ParseFloat(r.URL.Query().Get("latY"), 32)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get lat y, err=%v", err), http.StatusBadRequest)
+			return
+		}
+
+		radius, err := strconv.ParseFloat(r.URL.Query().Get("radius"), 32)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get radius, err=%v", err), http.StatusBadRequest)
 			return
 		}
 
 		// Stream responses
 		req := &pb.GetUpdatesRequest{
-			LongX:  body.LongX,
-			LatY:   body.LatY,
-			Radius: body.Radius,
+			LongX:  float32(longX),
+			LatY:   float32(latY),
+			Radius: float32(radius),
 		}
 
 		stream, err := updatesClient.GetUpdates(r.Context(), req)

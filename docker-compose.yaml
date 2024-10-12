@@ -1,16 +1,15 @@
 version: "3.8"
 
 services:
+    # Service
     redis:
         image: redis:latest
-        container_name: redis
         ports:
-            - "6379:6379"
-    mysql:
+            - "6379"
+    db:
         image: mysql:latest
-        container_name: mysql
         ports:
-            - "3306:3306"
+            - "3306"
         environment:
             MYSQL_ROOT_PASSWORD: pass123
             MYSQL_DATABASE: db
@@ -18,3 +17,79 @@ services:
             MYSQL_PASSWORD: pass123
         volumes:
             - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    # Feedme
+    updates:
+        image: feedme/updates
+        build:
+            context: src
+            dockerfile: updates/Dockerfile
+        ports:
+            - "3000"
+        environment:
+            PORT: "3000"
+            REDIS_ADDR: "redis:6379"
+        depends_on:
+            - redis
+    item:
+        image: feedme/item
+        build:
+            context: src
+            dockerfile: item/Dockerfile
+        ports:
+            - "3000"
+        environment:
+            PORT: "3000"
+            REDIS_ADDR: "redis:6379"
+            MYSQL_DSN: "user:pass123@tcp(db:3306)/db"
+        depends_on:
+            - redis
+            - db
+    user:
+        image: feedme/user
+        build:
+            context: src
+            dockerfile: user/Dockerfile
+        ports:
+            - "3000"
+        environment:
+            PORT: "3000"
+            MYSQL_DSN: "user:pass123@tcp(db:3306)/db"
+        depends_on:
+            - db
+    business:
+        image: feedme/business
+        build:
+            context: src
+            dockerfile: business/Dockerfile
+        ports:
+            - "3000"
+        environment:
+            PORT: "3000"
+            MYSQL_DSN: "user:pass123@tcp(db:3306)/db"
+        depends_on:
+            - db
+    apigw:
+        image: feedme/apigw
+        build:
+            context: src
+            dockerfile: apigw/Dockerfile
+        ports:
+            - "3000:3000"
+        environment:
+            PORT: "3000"
+            UPDATES_ADDR: "updates:3000"
+            USER_ADDR: "user:3000"
+            BUSINESS_ADDR: "business:3000"
+            ITEM_ADDR: "item:3000"
+            REDIS_ADDR: "redis:6379"
+            BASE_URL: "http://localhost:3000"
+            GOOGLE_CLIENT_ID: "EXAMPLE_CLIENT_ID"
+            GOOGLE_CLIENT_SECRET: "EXAMPLE_CLIENT_SECRET"
+            SERVER_SECRET: "testsecret"
+        depends_on:
+            - business
+            - user
+            - item
+            - updates
+            - redis

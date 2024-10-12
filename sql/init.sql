@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 -- Business table
 
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS businesses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
     description VARCHAR(255),
-    latitude DECIMAL(16,14),
-    longitude DECIMAL(16,14),
+    latitude VARCHAR(255),
+    longitude VARCHAR(255),
     created_by INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

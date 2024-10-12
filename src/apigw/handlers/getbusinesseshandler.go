@@ -4,15 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/benosborntech/feedme/common/types"
 	"github.com/benosborntech/feedme/pb"
 )
-
-type getBusinessesHandlerRequestBody struct {
-	Page     int `json:"page"`
-	PageSize int `json:"pageSize"`
-}
 
 type getBusinessesHandlerResponseBody struct {
 	Business []*types.Business `json:"business"`
@@ -20,15 +16,21 @@ type getBusinessesHandlerResponseBody struct {
 
 func GetBusinessesHandler(businessClient pb.BusinessClient) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var body getBusinessesHandlerRequestBody
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, fmt.Sprintf("failed to unmarshal body, err=%v", err), http.StatusInternalServerError)
+		page, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get page, err=%v", err), http.StatusBadRequest)
+			return
+		}
+
+		pageSize, err := strconv.Atoi(r.URL.Query().Get("pageSize"))
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to get page size, err=%v", err), http.StatusBadRequest)
 			return
 		}
 
 		data, err := businessClient.QueryBusiness(r.Context(), &pb.QueryBusinessRequest{
-			Page:     int32(body.Page),
-			PageSize: int32(body.PageSize),
+			Page:     int32(page),
+			PageSize: int32(pageSize),
 		})
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to query business, err=%v", err), http.StatusInternalServerError)

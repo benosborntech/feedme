@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 )
 
@@ -37,6 +39,15 @@ func (h *HTTPUtil) GetHandler() http.Handler {
 	for path, methods := range h.handlers {
 		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 			method := r.Method
+
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Failed to read request body", http.StatusBadRequest)
+				return
+			}
+			defer r.Body.Close()
+
+			log.Printf("[APIGW Handler] path=%s, method=%s, req=%s", path, method, body)
 
 			handler, ok := methods[method]
 			if !ok {

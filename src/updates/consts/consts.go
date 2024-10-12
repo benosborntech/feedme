@@ -1,5 +1,5 @@
 package consts
 
 const (
-	PORT = "3001"
+	PORT = "3000"
 )

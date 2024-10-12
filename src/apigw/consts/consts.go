@@ -3,7 +3,7 @@ package consts
 import "time"
 
 const (
-	PORT = "3002"
+	PORT = "3000"
 
 	STATE_LENGTH   = 32
 	SESSION_LENGTH = 32
